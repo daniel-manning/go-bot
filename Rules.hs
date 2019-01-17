@@ -9,7 +9,8 @@ data Move = Play Point | Pass | Resign deriving Show
 
 data Board = Board Int [ConnectedGroup]
 
-neighbourhood (x, y) = [(x -1, y), (x, y + 1), (x, y - 1), (x + 1, y)]
+neighbourhood::Point -> [Point]
+neighbourhood (Point x y) = [Point (x - 1) y, Point x (y + 1), Point x (y - 1), Point (x + 1) y]
 
 data ConnectedGroup = Group Player [Point] [Point] deriving Show
 
@@ -23,5 +24,25 @@ numberOfLiberties (Group p s l) = length l
 isOnGrid::Point -> Board -> Bool
 isOnGrid (Point x y) (Board s _) = (1 <= x) && (x < s) && (1 <= y) && (y < s) 
 
+groupContainsPoint::Point -> ConnectedGroup -> Bool
+groupContainsPoint p (Group pl st _) = p `elem` st
+
+whichPlayer::ConnectedGroup -> Player
+whichPlayer (Group pl _ _) = pl
+
+getSpaceOnGrid::Point -> Board -> Maybe Player
+getSpaceOnGrid p (Board _ []) = Nothing
+getSpaceOnGrid p (Board n (cg:cgs)) | groupContainsPoint p cg  = Just (whichPlayer cg)
+                                    | otherwise = getSpaceOnGrid p (Board n (cgs))
+                                            
+buildConnectedGroupFromNeighbourhood::[Point] -> ConnectedGroup
+buildConnectedGroupFromNeighbourhood p =  undefined $ map (\k -> (k, getSpaceOnGrid k)) p
+
+f::Player -> [(Point, Maybe Player)] -> ConnectedGroup
+f pl p = Group pl [undefined] [undefined]
+
+
 placeStone::Player -> Point -> Board -> Board
-placeStone pl p b =  undefined --neighbourhood p
+placeStone pl p b = undefined --filter(\p1 -> isOnGrid p1 b) $ neighbourhood p
+
+
