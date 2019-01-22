@@ -1,5 +1,6 @@
 --import Data.Set
 import Data.List
+import Data.Maybe
 
 data Player = Black | White deriving (Show, Eq)
 
@@ -39,7 +40,7 @@ buildConnectedGroupFromNeighbourhood::[Point] -> ConnectedGroup
 buildConnectedGroupFromNeighbourhood p =  undefined $ map (\k -> (k, getSpaceOnGrid k)) p
 
 f::Player -> [(Point, Maybe Player)] -> ConnectedGroup
-f pl p = Group pl [undefined] [undefined]
+f pl p = Group pl [undefined] (map fst $ filter (isNothing.snd) p)
 
 
 placeStone::Player -> Point -> Board -> Board
