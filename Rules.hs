@@ -1,5 +1,6 @@
 --import Data.Set
 import Data.List
+import Data.Maybe
 
 data Player = Black | White deriving (Show, Eq)
 
@@ -35,14 +36,22 @@ getSpaceOnGrid p (Board _ []) = Nothing
 getSpaceOnGrid p (Board n (cg:cgs)) | groupContainsPoint p cg  = Just (whichPlayer cg)
                                     | otherwise = getSpaceOnGrid p (Board n (cgs))
                                             
-buildConnectedGroupFromNeighbourhood::[Point] -> ConnectedGroup
-buildConnectedGroupFromNeighbourhood p =  undefined $ map (\k -> (k, getSpaceOnGrid k)) p
+buildConnectedGroupFromNeighbourhood::Point -> Player -> Board -> ConnectedGroup
+buildConnectedGroupFromNeighbourhood st pl b =  f st pl $ map (\k -> (k, getSpaceOnGrid k b)) (neighbourhood st)
 
-f::Player -> [(Point, Maybe Player)] -> ConnectedGroup
-f pl p = Group pl [undefined] [undefined]
+f::Point -> Player -> [(Point, Maybe Player)] -> ConnectedGroup
+f st pl p = Group pl [st] (map fst $ filter (isNothing.snd) p)
 
+--reduce liberties for the new stone placed
+--merge joined connected groups
 
 placeStone::Player -> Point -> Board -> Board
 placeStone pl p b = undefined --filter(\p1 -> isOnGrid p1 b) $ neighbourhood p
 
-
+--Board 5 [
+--Group Black [Point 1 4] [Point 0 4, Point 1 3, Point 1 5, Point 2 4],
+--Group Black [Point 2 1, Point 2 2] [Point 1 1, Point 1 2, Point 2 3, Point 2 0, Point 3 2],
+--Group Black [Point 3 3, Point 3 4] [Point 2 3, Point 2 4, Point 3 2, Point 3 5],
+--Group White [Point 3 1] [Point 3 0, Point 3 2, Point 4 1],
+--Group White [Point 4 1, Point 4 2, Point 4 3] [Point 3 2, Point 4 1, Point 4 5, Point 5 2, Point 5 3, Point 5 4]
+--]
